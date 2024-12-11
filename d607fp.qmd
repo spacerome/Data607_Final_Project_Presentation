@@ -1,0 +1,201 @@
+---
+title: "Exoplanet Detection"
+author: "Anthony Josue Roman"
+format: revealjs
+theme: solarized
+transition: fade
+highlight_style: monokai
+editor: visual
+---
+
+```{r include=FALSE}
+library(rsconnect)
+library(readr)
+library(RCurl)
+library(stringr)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(data.table)
+library(DT)
+library(plotly)
+library(cluster)
+library(astrolibR) # devtools::install_github("cran/astrolibR") if needed
+library(FNN)
+library(ggcorrplot)
+```
+
+```{r prereq, include = FALSE}
+# Load matched data
+matched_data <- read_csv("matched_exoplanet_gaia_data.csv")
+
+# Preview the dataset
+#head(matched_data)
+
+# Summary of key variables
+#summary(matched_data)
+
+# Check for missing values
+#colSums(is.na(matched_data))
+
+# Ensure luminosity is calculated
+matched_data <- matched_data %>%
+  mutate(luminosity = (radius^2) * (effective_temperature / 5778)^4)
+
+# Calculate habitable zone boundaries and classify planets
+matched_data <- matched_data %>%
+  mutate(
+    habitable_zone_inner = 0.75 * sqrt(luminosity),
+    habitable_zone_outer = 1.5 * sqrt(luminosity),
+    in_habitable_zone = radius > habitable_zone_inner & radius < habitable_zone_outer
+  )
+
+```
+
+## Introduction {.smaller}
+
+-   **Topic**: Exploring the characteristics and distribution of exoplanets.
+
+-   **Key Goals**:
+
+    1.  Analyze exoplanetary characteristics using data from NASA Exoplanet Archive.
+    2.  Investigate stellar properties using Gaia catalog.
+    3.  Identify trends and insights, focusing on habitable zone classification.
+
+![](uranus.jpg){width="300," fig-align="center"}
+
+## What are Exoplanets? {.smaller}
+
+-   **Definition**: Planets orbiting stars outside our solar system.
+
+-   **Detection**:
+
+    -   **Direct Imaging**: Capturing light from exoplanets.
+    -   **Transit Method**: Observing starlight dimming as exoplanets pass.
+    -   **Radial Velocity**: Detecting star wobble due to exoplanet gravity.
+
+## Data Sources {.smaller}
+
+-   **NASA Exoplanet Archive**:
+
+    -   Provides data on exoplanet characteristics and detection methods.
+
+-   **Gaia Catalog**:
+
+    -   Supplements with stellar properties (e.g., radius, mass, temperature).
+
+-   **Challenges**:
+
+    -   Merging datasets based on celestial coordinates.
+    -   Cleaning inconsistent or missing data.
+
+## Data Transformation {.smaller}
+
+-   **Cleaning Steps**:
+
+    -   Removed outliers and handled missing values.
+    -   Standardized units across datasets.
+
+-   **Derived Metrics**:
+
+    -   Luminosity: \\( L = R\^2 \\times \\left(\\frac{T}{5778}\\right)\^4 \\)
+    -   Habitable Zone Boundaries:
+        -   Inner: \\( 0.75 \\times \\sqrt{L} \\)
+        -   Outer: \\( 1.5 \\times \\sqrt{L} \\)
+
+## Exploratory Data Analysis {.smaller}
+
+**Visualizations**:
+
+1.  **Effective Temperature Distribution**:
+    -   Most stars are between 4000K and 6500K.
+2.  **Stellar Radius vs. Mass**:
+    -   Positive correlation aligns with theoretical models.
+
+## Exploratory Data Analysis {.smaller}
+
+![](000010.png){width="300," fig-align="center"}
+
+## Exploratory Data Analysis {.smaller}
+
+![](000011.png){width="300," fig-align="center"}
+
+## Exploratory Data Analysis {.smaller}
+
+![](000012.png){width="300," fig-align="center"}
+
+## Habital Zone Analysis {.smaller}
+
+-   **Definition**: Region around a star where conditions support liquid water.
+
+-   **Insights**:
+
+    -   Small fraction of planets exist in the habital zone.
+    -   Higher luminosity stars have larger habital zones.
+
+## Habital Zone Analysis {.smaller}
+
+![](000016.png){width="300," fig-align="center"}
+
+## Habital Zone Analysis {.smaller}
+
+![](000013.png){width="300," fig-align="center"}
+
+## Statistical Analysis {.smaller}
+
+1.  **Regression Analysis**:
+
+-   Explored relationships between stellar mass, radius, and temperature.
+-   Results confirm strong positive correlations
+
+2.  **Hypothesis Testing**:
+
+-   Compared orbital radii for planets in and outside of the habital zone.
+-   Results indicate significant differences.
+
+## Statistical Analysis {.smaller}
+
+![](000018.png){width="300," fig-align="center"}
+
+## Statistical Analysis {.smaller}
+
+![](000019.png){width="300," fig-align="center"}
+
+## Statistical Analysis {.smaller}
+
+![](000020.png){width="300," fig-align="center"}
+
+## Challenges and Solutions {.smaller}
+
+-   Merging datasets with celestial coordinates
+    -   **Solution**: Used angular separation for accurate matching.
+-   Handling misisng stellar parameters:
+    -   **Solution**: Filtered incomplete data before analysis.
+-   Classifying planets in the habitable zone:
+    -   **Solution**: Calculated boundaries based on luminosity.
+
+## Conclusion {.smaller}
+
+-   **Key Findings**:
+
+    -   Most exoplanets are small and close to their host stars.
+    -   Small fraction lie in the habital zone.
+
+-   **Implications**:
+
+    -   Future missions should target Sun-like stars with Earth-like planets.
+
+-   **Future Work**:
+
+    -   Investigate the impact of metallicity and stellar age on habitability.
+
+## References {.smaller}
+
+1.  NASA Exoplanet Archive: <https://exoplanetarchive.ipac.caltech.edu/>
+2.  Gaia Archive: <https://gea.esac.esa.int/archive/>
